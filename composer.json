@@ -17,5 +17,12 @@
         "psr-4": {
             "Rutatiina\\Contact\\": "src/"
         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Rutatiina\\Contact\\ContactServiceProvider"
+            ]
+        }
     }
 }

@@ -139,9 +139,9 @@ class ContactController extends Controller
         }
 
         $statistics = [
-            'invoices' => Invoice::where('debit_contact_id', $contact->id)->orWhere('credit_contact_id', $contact->id)->count(),
-            'bills' => Bill::where('debit_contact_id', $contact->id)->orWhere('credit_contact_id', $contact->id)->count(),
-            'orders' => SalesOrder::where('debit_contact_id', $contact->id)->orWhere('credit_contact_id', $contact->id)->count(),
+            'invoices' => Invoice::where('contact_id', $contact->id)->count(),
+            'bills' => Bill::where('contact_id', $contact->id)->count(),
+            'orders' => SalesOrder::where('contact_id', $contact->id)->count(),
         ];
 
         $contact->statistics = $statistics;
@@ -370,7 +370,7 @@ class ContactController extends Controller
 
 
         $query = Txn::query();
-        $query->where('debit_contact_id', $contact->id);
+        $query->where('contact_id', $contact->id);
         $query->where('tenant_id', Auth::user()->tenant->id);
         $query->where('base_currency', $currency);
         $query->where('date', '>=', $opening_date);

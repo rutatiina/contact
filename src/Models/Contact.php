@@ -31,7 +31,12 @@ class Contact extends Model
 
     protected $guarded = [];
 
-    protected $appends = ['receviables', 'payables', 'currency_and_exchange_rate', 'currencies_and_exchange_rates'];
+    protected $appends = [
+        'receviables',
+        'payables',
+        'currency_and_exchange_rate',
+        'currencies_and_exchange_rates'
+    ];
 
     protected $dates = ['deleted_at'];
 
@@ -106,7 +111,7 @@ class Contact extends Model
     public function getReceviablesAttribute()
     {
         //1 - Receivables
-        $balance = AccountClass::date(null)->accountCode(1)->contactId($this->id)->currency($this->currency)->balanceByContact(true);
+        $balance = AccountClass::date(null)->accountCode(config('financial-accounting.accounts_receivable_code'))->contactId($this->id)->currency($this->currency)->balanceByContact(true);
         if ($balance) {
             return ($balance->debit - $balance->credit);
         } else {
@@ -117,7 +122,7 @@ class Contact extends Model
     public function getPayablesAttribute()
     {
         //4 - Payables
-        $balance = AccountClass::date(null)->accountCode(4)->contactId($this->id)->currency($this->currency)->balanceByContact(true);
+        $balance = AccountClass::date(null)->accountCode(config('financial-accounting.accounts_payables_code'))->contactId($this->id)->currency($this->currency)->balanceByContact(true);
 
         if ($balance) {
             return ($balance->credit - $balance->debit);

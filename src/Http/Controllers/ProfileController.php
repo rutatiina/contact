@@ -3,7 +3,7 @@
 namespace Rutatiina\Contact\Http\Controllers;
 
 use Illuminate\Validation\Rule;
-use App\User;
+use Rutatiina\User\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;

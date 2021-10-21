@@ -141,16 +141,6 @@ class Contact extends Model
         }
     }
 
-    public function getCurrenciesAttribute($value)
-    {
-        if (empty($this->currencies)) {
-            return [$this->currency];
-        }
-        else {
-            return [];
-        }
-    }
-
     public function getCurrencyAndExchangeRateAttribute()
     {
         $tenant = Tenant::find($this->tenant_id); //Auth::user()->tenant;
@@ -166,7 +156,7 @@ class Contact extends Model
     public function getCurrenciesAndExchangeRatesAttribute()
     {
         $tenant = Tenant::find($this->tenant_id);
-        $contactCurrencies = $this->currencies;
+        $contactCurrencies = (is_array($this->currencies)) ? $this->currencies : [];
         $currencies = [];
         $contactExchangeRate = exchangeRates($contactCurrencies, $tenant->base_currency);
 

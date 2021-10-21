@@ -176,7 +176,7 @@ class ContactController extends Controller
         {
             $selectedCurrencies[] = [
                 'value' => $value,
-                'text' => $currencies[$value]
+                'text' => $value.' - '.$currencies[$value]
             ];
         }
 

@@ -379,10 +379,16 @@ class ContactController extends Controller
         }
 
         //if all the bove conditions are passed: Delete the contact
-        $contact->comments->delete();
-        $contact->contact_persons->delete();
-        $contact->address_book->delete();
+        $contact->comments()->delete();
+        $contact->contact_persons()->delete();
+        $contact->address_book()->delete();
         $contact->delete();
+
+        return [
+            'status' => true,
+            'messages' => ['Contact deleted.'],
+            'callback' => '/contacts',
+        ];
 
     }
 

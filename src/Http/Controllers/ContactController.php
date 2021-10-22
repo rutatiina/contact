@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Request as FacadesRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Rutatiina\Bill\Models\Bill;
+use Rutatiina\Contact\Models\Comment;
 use Rutatiina\FinancialAccounting\Traits\Forex;
 use Rutatiina\Invoice\Models\Invoice;
 use Rutatiina\SalesOrder\Models\SalesOrder;
@@ -230,14 +231,166 @@ class ContactController extends Controller
         }
     }
 
-    public function destroy()
+    public function destroy($id)
     {
-        //
+        //deactivate the contact
+        $contact = Contact::find($id);
+        $contact->status = 'inactive';
+        $contact->save();
+
+        #ckeck if contact is attached to any sales transactions
+
+        //estimates
+        if (class_exists(\Rutatiina\Estimate\Models\Estimate::class) && \Rutatiina\Estimate\Models\Estimate::where('contact_id', $id)->first())
+        {
+            return [
+                'status' => false,
+                'messages' => ['Contact is attached to an Estimate and thus cannot be deleted but only deactivated.'],
+            ];
+        }
+
+        //retainer invoices
+        if (class_exists(\Rutatiina\RetainerInvoice\Models\RetainerInvoice::class) && \Rutatiina\RetainerInvoice\Models\RetainerInvoice::where('contact_id', $id)->first())
+        {
+            return [
+                'status' => false,
+                'messages' => ['Contact is attached to an Retainer Invoice and thus cannot be deleted but only deactivated.'],
+            ];
+        }
+
+        //sales orders
+        if (class_exists(\Rutatiina\SalesOrder\Models\SalesOrder::class) && \Rutatiina\SalesOrder\Models\SalesOrder::where('contact_id', $id)->first())
+        {
+            return [
+                'status' => false,
+                'messages' => ['Contact is attached to an Sales Order and thus cannot be deleted but only deactivated.'],
+            ];
+        }
+
+        //invoices
+        if (class_exists(\Rutatiina\Invoice\Models\Invoice::class) && \Rutatiina\Invoice\Models\Invoice::where('contact_id', $id)->first())
+        {
+            return [
+                'status' => false,
+                'messages' => ['Contact is attached to an Invoice and thus cannot be deleted but only deactivated.'],
+            ];
+        }
+
+        //payment received
+        if (class_exists(\Rutatiina\PaymentReceived\Models\PaymentReceived::class) && \Rutatiina\PaymentReceived\Models\PaymentReceived::where('contact_id', $id)->first())
+        {
+            return [
+                'status' => false,
+                'messages' => ['Contact is attached to an Payment Received and thus cannot be deleted but only deactivated.'],
+            ];
+        }
+
+        //recurring invoices
+        if (class_exists(\Rutatiina\Invoice\Models\RecurringInvoice::class) && \Rutatiina\Invoice\Models\RecurringInvoice::where('contact_id', $id)->first())
+        {
+            return [
+                'status' => false,
+                'messages' => ['Contact is attached to an Recurring Invoice and thus cannot be deleted but only deactivated.'],
+            ];
+        }
+
+        //credit notes
+        if (class_exists(\Rutatiina\CreditNote\Models\CreditNote::class) && \Rutatiina\CreditNote\Models\CreditNote::where('contact_id', $id)->first())
+        {
+            return [
+                'status' => false,
+                'messages' => ['Contact is attached to an Credit Note and thus cannot be deleted but only deactivated.'],
+            ];
+        }
+
+
+        #ckeck if contact is attached to any purchases transactions
+
+        //expenses
+        if (class_exists(\Rutatiina\Expense\Models\Expense::class) && \Rutatiina\Expense\Models\Expense::where('contact_id', $id)->first())
+        {
+            return [
+                'status' => false,
+                'messages' => ['Contact is attached to an Expense and thus cannot be deleted but only deactivated.'],
+            ];
+        }
+
+        //recurring expenses
+        if (class_exists(\Rutatiina\Expense\Models\RecurringExpense::class) && \Rutatiina\Expense\Models\RecurringExpense::where('contact_id', $id)->first())
+        {
+            return [
+                'status' => false,
+                'messages' => ['Contact is attached to an Recurring expense and thus cannot be deleted but only deactivated.'],
+            ];
+        }
+
+        //purchase orders
+        if (class_exists(\Rutatiina\PurchaseOrder\Models\PurchaseOrder::class) && \Rutatiina\PurchaseOrder\Models\PurchaseOrder::where('contact_id', $id)->first())
+        {
+            return [
+                'status' => false,
+                'messages' => ['Contact is attached to an Purchase Order and thus cannot be deleted but only deactivated.'],
+            ];
+        }
+
+        //bills
+        if (class_exists(\Rutatiina\Bill\Models\Bill::class) && \Rutatiina\Bill\Models\Bill::where('contact_id', $id)->first())
+        {
+            return [
+                'status' => false,
+                'messages' => ['Contact is attached to an Bill and thus cannot be deleted but only deactivated.'],
+            ];
+        }
+
+        //payment made
+        if (class_exists(\Rutatiina\PaymentMade\Models\PaymentMade::class) && \Rutatiina\PaymentMade\Models\PaymentMade::where('contact_id', $id)->first())
+        {
+            return [
+                'status' => false,
+                'messages' => ['Contact is attached to an Payment Made and thus cannot be deleted but only deactivated.'],
+            ];
+        }
+
+        //recurring bill
+        if (class_exists(\Rutatiina\Bill\Models\RecurringBill::class) && \Rutatiina\Bill\Models\RecurringBill::where('contact_id', $id)->first())
+        {
+            return [
+                'status' => false,
+                'messages' => ['Contact is attached to an Recurring Bill and thus cannot be deleted but only deactivated.'],
+            ];
+        }
+
+        //debit notes
+        if (class_exists(\Rutatiina\DebitNote\Models\DebitNote::class) && \Rutatiina\DebitNote\Models\DebitNote::where('contact_id', $id)->first())
+        {
+            return [
+                'status' => false,
+                'messages' => ['Contact is attached to an Debit Note and thus cannot be deleted but only deactivated.'],
+            ];
+        }
+
+        //Journal entry
+        if (class_exists(\Rutatiina\JournalEntry\Models\JournalEntryRecording::class) && \Rutatiina\JournalEntry\Models\JournalEntryRecording::where('contact_id', $id)->first())
+        {
+            return [
+                'status' => false,
+                'messages' => ['Contact is attached to an Journal entry and thus cannot be deleted but only deactivated.'],
+            ];
+        }
+
+        //if all the bove conditions are passed: Delete the contact
+        $contact->comments->delete();
+        $contact->contact_persons->delete();
+        $contact->address_book->delete();
+        $contact->delete();
+
     }
 
     public function search(Request $request)
     {
         $query = Contact::query();
+        $query->where('status', 'active');
+
         foreach ($request->search as $search)
         {
             $query->where($search['column'], 'like', '%' . $search['value'] . '%');

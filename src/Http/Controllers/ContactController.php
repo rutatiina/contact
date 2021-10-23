@@ -92,6 +92,11 @@ class ContactController extends Controller
         $data = [
             'pageTitle' => 'Create Contact',
             'urlPost' => '/contacts', #required
+            'routes' => [
+                'store' => route('contacts.store'),
+                'deactivate' => route('contacts.deactivate'),
+                'activate' => route('contacts.activate'),
+            ],
             'types' => ['customer', 'supplier', 'salesperson', 'agent'],
             //'currencies' => ClassesCurrencies::en_INSelectOptions(),
             //'countries' => ClassesCountries::ungroupedSelectOptions(),
@@ -140,6 +145,10 @@ class ContactController extends Controller
         }
 
         $statistics = [
+            'routes' => [
+                'deactivate' => route('contacts.deactivate'),
+                'activate' => route('contacts.activate'),
+            ],
             'invoices' => Invoice::where('contact_id', $contact->id)->count(),
             'bills' => Bill::where('contact_id', $contact->id)->count(),
             'orders' => SalesOrder::where('contact_id', $contact->id)->count(),
@@ -147,7 +156,14 @@ class ContactController extends Controller
 
         $contact->statistics = $statistics;
 
-        return $contact;
+        return [
+            'routes' => [
+                'destroy' => route('contacts.destroy', ['id', $contact->id]),
+                'deactivate' => route('contacts.deactivate'),
+                'activate' => route('contacts.activate'),
+            ],
+            'contact' => $contact,
+        ];
 
     }
 
@@ -805,7 +821,11 @@ class ContactController extends Controller
 
         $response = [
             'status' => true,
-            'message' => count($request->ids) . ' Contact(s) deactivated.'
+            'messages' => [count($request->ids) . ' Contact(s) deactivated.'],
+            'contact' => [
+                'status' => 'inactive'
+            ]
+
         ];
 
         return json_encode($response);
@@ -817,7 +837,10 @@ class ContactController extends Controller
 
         $response = [
             'status' => true,
-            'message' => count($request->ids) . ' Contact(s) activated.',
+            'messages' => [count($request->ids) . ' Contact(s) activated.'],
+            'contact' => [
+                'status' => 'active'
+            ]
         ];
 
         return json_encode($response);
@@ -829,7 +852,7 @@ class ContactController extends Controller
 
         $response = [
             'status' => true,
-            'message' => count($request->ids) . ' Contact(s) deleted.',
+            'messages' => count($request->ids) . ' Contact(s) deleted.',
         ];
 
         return json_encode($response);

@@ -857,4 +857,13 @@ class ContactController extends Controller
 
         return json_encode($response);
     }
+
+    public function routes()
+    {
+        return [
+            'delete' => route('contacts.delete'),
+            'activate' => route('contacts.activate'),
+            'deactivate' => route('contacts.deactivate'),
+        ];
+    }
 }

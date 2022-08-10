@@ -26,6 +26,7 @@ use Rutatiina\Globals\Services\Currencies as ClassesCurrencies;
 use Maatwebsite\Excel\Facades\Excel;
 use Rutatiina\FinancialAccounting\Models\Account;
 use Rutatiina\FinancialAccounting\Models\ContactBalance;
+use Illuminate\Support\Str;
 
 use Rutatiina\Contact\Classes\Store as ContactStore;
 use Rutatiina\Contact\Classes\Update as ContactUpdate;
@@ -53,19 +54,33 @@ class ContactController extends Controller
         $this->closing_date = date('Y-m-d');
     }
 
-    public function index()
+    public function index(Request $request)
     {
         //return view('contact.limitless::index');
-
+   
         if (!FacadesRequest::wantsJson())
         {
             return view('ui.limitless::layout_2-ltr-default.appVue');
         }
 
-        $Contact = Contact::paginate(15);
+        $query = Contact::query();
+
+        if ($request->search)
+        {
+            $query->where(function($q) use ($request) {
+                $columns = (new Contact)->getSearchableColumns();
+                foreach($columns as $column)
+                {
+                    $q->orWhere($column, 'like', '%'.Str::replace(' ', '%', $request->search).'%');
+                }
+            });
+        }
+
+        $query->latest();
+        $Contacts = $query->paginate(15);
 
         return [
-            'tableData' => $Contact
+            'tableData' => $Contacts
         ];
     }
 

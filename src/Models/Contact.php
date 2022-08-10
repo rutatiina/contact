@@ -10,6 +10,7 @@ use Rutatiina\Tenant\Models\Tenant;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Support\Facades\Auth;
 use Rutatiina\FinancialAccounting\Classes\AccountClass;
+use Illuminate\Support\Facades\Schema;
 
 class Contact extends Model
 {
@@ -191,5 +192,10 @@ class Contact extends Model
     public function address_book()
     {
         return $this->hasMany('Rutatiina\Contact\Models\AddressBook', 'contact_id');
+    }
+
+    public function getSearchableColumns()
+    {
+        return Schema::connection('tenant')->getColumnListing($this->table);
     }
 }

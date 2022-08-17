@@ -47,6 +47,8 @@ class Contact extends Model
         'taxes' => 'array',
     ];
 
+    public static $type_options = ['customer', 'supplier', 'salesperson', 'agent'];
+
     /**
      * The "booting" method of the model.
      *
@@ -57,6 +59,22 @@ class Contact extends Model
         parent::boot();
 
         static::addGlobalScope(new TenantIdScope);
+    }
+
+    /**
+     * Cast an attribute to a native PHP type.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function castAttribute($key, $value)
+    {
+        if ($this->getCastType($key) == 'array' && is_null($value)) {
+            return [];
+        }
+
+        return parent::castAttribute($key, $value);
     }
 
     public function rgGetAttributes()

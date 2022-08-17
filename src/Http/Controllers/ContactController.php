@@ -112,7 +112,7 @@ class ContactController extends Controller
                 'deactivate' => route('contacts.deactivate'),
                 'activate' => route('contacts.activate'),
             ],
-            'types' => ['customer', 'supplier', 'salesperson', 'agent'],
+            'types' => Contact::$type_options, #required
             //'currencies' => ClassesCurrencies::en_INSelectOptions(),
             //'countries' => ClassesCountries::ungroupedSelectOptions(),
             //'taxes' => Tax::all(),
@@ -227,6 +227,7 @@ class ContactController extends Controller
         $data = [
             'pageTitle' => 'Update Contact',
             'urlPost' => '/contacts/' . $attributes->id, #required
+            'types' => Contact::$type_options, #required
             //'currencies' => ClassesCurrencies::en_INSelectOptions(),
             //'countries' => ClassesCountries::ungroupedSelectOptions(),
             //'taxes' => $taxes,

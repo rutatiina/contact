@@ -112,7 +112,7 @@ class ContactController extends Controller
             $image = null;
 
             if ($request->file('image')) {
-                $image = Storage::disk('public_storage')->putFile('/', $request->file('image'));
+                $image = Storage::disk('public')->putFile('/', $request->file('image'));
             }
 
             if ($request->display_name) {
@@ -273,7 +273,7 @@ class ContactController extends Controller
 			}
 
             if ($request->file('image')) {
-                $contact->image = Storage::disk('public_storage')->putFile('/', $request->file('image'));;
+                $contact->image = Storage::disk('public')->putFile('/', $request->file('image'));;
             }
 
             $contact->types = json_encode($request->types);

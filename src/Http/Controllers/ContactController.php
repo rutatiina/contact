@@ -743,7 +743,7 @@ class ContactController extends Controller
         //print_r($this->input->post()); exit;
 
         //Save the uploaded file
-        $importFile = Storage::disk('public_storage')->putFile('/', $request->file('file'));
+        $importFile = Storage::disk('public')->putFile('/', $request->file('file'));
 
 
         //Copy imported file into array

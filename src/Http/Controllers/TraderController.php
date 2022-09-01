@@ -227,7 +227,7 @@ class TraderController extends Controller
             $image = null;
 
             if ($request->file('image')) {
-                $image = Storage::disk('public_storage')->putFile('/', $request->file('image'));
+                $image = Storage::disk('public')->putFile('/', $request->file('image'));
             }
 
             $contact                    = new Contact;
@@ -407,7 +407,7 @@ class TraderController extends Controller
             $image = null;
 
             if ($request->file('image')) {
-                $image = Storage::disk('public_storage')->putFile('/', $request->file('image'));
+                $image = Storage::disk('public')->putFile('/', $request->file('image'));
             }
 
             $contact                    = Contact::find($id);

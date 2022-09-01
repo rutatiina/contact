@@ -41,7 +41,7 @@ class Store
             $image = null;
 
             if ($request->file('image')) {
-                $image = Storage::disk('public_storage')->putFile('/', $request->file('image'));
+                $image = Storage::disk('public')->putFile('/', $request->file('image'));
             }
 
             if ($request->display_name) {

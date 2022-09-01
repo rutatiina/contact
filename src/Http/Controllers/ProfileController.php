@@ -283,7 +283,7 @@ class ProfileController extends Controller
     public function imageUpdate(Request $request)
     {
         if ($request->file('image')) {
-            $image              = Storage::disk('public_storage')->putFile('/', $request->file('image'));
+            $image              = Storage::disk('public')->putFile('/', $request->file('image'));
             $contact            = Contact::find(Auth::user()->contact_id);
             $contact->image     = $image;
             $contact->save();

@@ -864,14 +864,30 @@ class ContactController extends Controller
 
     public function delete(Request $request)
     {
-        Contact::whereIn('id', $request->ids)->delete();
 
-        $response = [
+        $contactsDeleted = 0;
+        $messages = [];
+
+        foreach($request->ids as $id)
+        {
+            $destroy = $this->destroy($id);
+
+            if($destroy['status']) 
+            {
+                $contactsDeleted++;
+            }
+            else
+            {
+                $messages = array_merge($messages, $destroy['messages']);
+            }
+        }
+
+        array_unshift($messages, $contactsDeleted . ' Customer(s) / Supplier(s) ... deleted.');
+        
+        return [
             'status' => true,
-            'messages' => count($request->ids) . ' Contact(s) deleted.',
+            'messages' => $messages,
         ];
-
-        return json_encode($response);
     }
 
     public function routes()

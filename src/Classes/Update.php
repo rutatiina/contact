@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Rutatiina\Contact\Models\Contact;
 use Rutatiina\Contact\Models\ContactPerson;
+use Illuminate\Validation\Rule;
 
 class Update
 {
@@ -19,15 +20,34 @@ class Update
 
     public function run($request)
     {
+        if (empty($request->display_name))
+        {
+            $request->request->add(['display_name' => trim($request->name)]); //trim($request->salutation.' '.$request->first_name.' '.$request->other_name);
+        }
+        
+        $customMessages = [
+            'display_name.unique' => "The display name (".$request->display_name.") has already been taken.",
+        ];
+
         $validator = Validator::make($request->all(), [
             'id' => ['required', 'numeric'],
             'types' => ['required', 'array'],
             'name' => ['required', 'string', 'max:255'],
+            'display_name' => [
+                'string', 
+                'max:255',
+                Rule::unique('Rutatiina\Contact\Models\Contact')
+                ->where(function ($query) {
+                    return $query->where('tenant_id', session('tenant_id'))->whereNull('deleted_at');
+                })
+                ->ignore($request->id, 'id')
+            ],
+            
             'currency' => ['required', 'string'],
             'currencies' => 'array',
             'taxes' => 'array',
             'country' => ['required', 'string'],
-        ]);
+        ], $customMessages);
 
         if ($validator->fails()) {
             $this->errors = $validator->errors()->all();

@@ -2,34 +2,35 @@
 
 namespace Rutatiina\Contact\Http\Controllers;
 
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Request as FacadesRequest;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use Rutatiina\Bill\Models\Bill;
-use Rutatiina\Contact\Models\Comment;
-use Rutatiina\FinancialAccounting\Traits\Forex;
-use Rutatiina\Invoice\Models\Invoice;
-use Rutatiina\SalesOrder\Models\SalesOrder;
 use Rutatiina\Tax\Models\Tax;
+use Rutatiina\Bill\Models\Bill;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\App;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Crypt;
+use Rutatiina\Contact\Models\Comment;
 use Rutatiina\Contact\Models\Contact;
+use Rutatiina\Invoice\Models\Invoice;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Rutatiina\Tenant\Traits\TenantTrait;
 use Yajra\DataTables\Facades\DataTables;
-use Rutatiina\Globals\Services\Countries as ClassesCountries;
-use Rutatiina\Globals\Services\Currencies as ClassesCurrencies;
-use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Validator;
+use Rutatiina\SalesOrder\Models\SalesOrder;
+use Rutatiina\Contact\Services\ContactService;
+use Rutatiina\FinancialAccounting\Traits\Forex;
 use Rutatiina\FinancialAccounting\Models\Account;
-use Rutatiina\FinancialAccounting\Models\ContactBalance;
-use Illuminate\Support\Str;
-
 use Rutatiina\Contact\Classes\Store as ContactStore;
 use Rutatiina\Contact\Classes\Update as ContactUpdate;
+use Rutatiina\FinancialAccounting\Models\ContactBalance;
+
+use Illuminate\Support\Facades\Request as FacadesRequest;
+use Rutatiina\Globals\Services\Countries as ClassesCountries;
+use Rutatiina\Globals\Services\Currencies as ClassesCurrencies;
 
 class ContactController extends Controller
 {
@@ -76,7 +77,7 @@ class ContactController extends Controller
             });
         }
 
-        $query->latest();
+        $query->orderBy('name', 'asc');
         $Contacts = $query->paginate(15);
 
         return [
@@ -92,20 +93,8 @@ class ContactController extends Controller
             return view('ui.limitless::layout_2-ltr-default.appVue');
         }
 
-        $user = Auth::user();
-        $tenant = $user->tenant;
-
-        $contact = new Contact;
-        $attributes = $contact->rgGetAttributes();
-
-        $attributes['types'][] = 'customer';
-        $attributes['country'] = $tenant->country;
-        $attributes['currency'] = $tenant->base_currency;
-        $attributes['currencies'] = [$tenant->base_currency];
-        $attributes['_method'] = 'POST';
-
         $data = [
-            'pageTitle' => 'Create Contact',
+            'pageTitle' => 'Create Contact / Supplier ...',
             'urlPost' => '/contacts', #required
             'routes' => [
                 'store' => route('contacts.store'),
@@ -116,7 +105,7 @@ class ContactController extends Controller
             //'currencies' => ClassesCurrencies::en_INSelectOptions(),
             //'countries' => ClassesCountries::ungroupedSelectOptions(),
             //'taxes' => Tax::all(),
-            'attributes' => $attributes,
+            'attributes' => ContactService::createAttributes(),
             'selectedCurrencies' => [],
             'selectedTaxes' => [],
         ];
@@ -139,6 +128,7 @@ class ContactController extends Controller
             return [
                 'status' => true,
                 'messages' => ['Contact saved'],
+                'attributes' => ContactService::createAttributes(),
             ];
         }
         else

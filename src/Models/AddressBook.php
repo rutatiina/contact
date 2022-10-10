@@ -8,6 +8,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class AddressBook extends Model
 {
+    use SoftDeletes;
     use LogsActivity;
 
     protected static $logName = 'AddressBook';

@@ -5,9 +5,11 @@ namespace Rutatiina\Contact\Models;
 use Illuminate\Database\Eloquent\Model;
 //use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Message extends Model
 {
+    use SoftDeletes;
     use LogsActivity;
 
     protected static $logName = 'Message';
